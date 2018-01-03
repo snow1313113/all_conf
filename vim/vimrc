@@ -1,0 +1,157 @@
+set nocompatible
+
+source $VIMRUNTIME/vimrc_example.vim
+"source $VIMRUNTIME/mswin.vim
+"behave mswin
+
+set diffexpr=MyDiff()
+function! MyDiff()
+  let opt = '-a --binary '
+  if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
+  if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
+  let arg1 = v:fname_in
+  if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
+  let arg2 = v:fname_new
+  if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
+  let arg3 = v:fname_out
+  if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
+  if $VIMRUNTIME =~ ' '
+    if &sh =~ '\<cmd'
+      if empty(&shellxquote)
+        let l:shxq_sav = ''
+        set shellxquote&
+      endif
+      let cmd = '"' . $VIMRUNTIME . '\diff"'
+    else
+      let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
+    endif
+  else
+    let cmd = $VIMRUNTIME . '\diff'
+  endif
+  silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3
+  if exists('l:shxq_sav')
+    let &shellxquote=l:shxq_sav
+  endif
+endfunction
+
+" add the comment of the file
+function! Add_file_comment()
+    let head_str = "/*\n"
+                \    ."* file name: ".expand("%")."\n"
+                \    ."* description: ...\n"
+                \    ."* author: lemonxu\n"
+                \    ."* create time:".strftime("%Y %b %d")
+                \    ."\n*/\n\n"
+    return head_str
+endfunction
+
+" add the precompile str in the file
+function! Add_precompile_head()
+    let def_str = toupper(substitute(expand("%"), "\\.", "_","g"))
+    let precompile_str = "#ifndef ".def_str."\n#define ".def_str."\n\n\n#endif"
+    return Add_file_comment().precompile_str
+endfunction
+
+"""""""""""""""""""""""""""
+" add by jerry
+"""""""""""""""""""""""""""
+if exists('+autochdir')
+    set autochdir
+endif
+
+
+filetype plugin indent on
+"set syntax=on
+syntax on
+
+" colorscheme darkblue
+" colorscheme solarized
+" colorscheme molokai
+set autoindent
+
+set smartindent
+" 设置case public等的缩进，以符合团队缩进要求
+set cinoptions=:0,g0
+" 设置tab键为四个空格
+set tabstop=4
+" 检查括号匹配
+set showmatch
+" tab键的缩进位数
+set shiftwidth=4
+" tab键展开成空格
+set expandtab
+
+set nowrap
+"set nu
+set incsearch
+set ignorecase
+set backupdir=~/vim_backup_file
+set undodir=~/vim_backup_file
+
+set guifont=Courier\ New:h10
+" 这里去掉Toolbar menu Left_scrollbar right_scrollbar base_scrollbar
+set guioptions-=L
+set guioptions-=T
+set guioptions-=m
+set guioptions-=b
+set guioptions-=r
+au GUIEnter * simalt ~x
+
+
+" 括号自动补全
+:inoremap ( ()<ESC>i
+:inoremap ) <c-r>=ClosePair(')')<CR>
+:inoremap { {}<ESC>i
+:inoremap } <c-r>=ClosePair('}')<CR>
+:inoremap [ []<ESC>i
+:inoremap ] <c-r>=ClosePair(']')<CR>
+:inoremap < <><ESC>i
+:inoremap > <c-r>=ClosePair('>')<CR>
+
+function! ClosePair(char)
+    if getline('.')[col('.') - 1] == a:char
+        return "\<Right>"
+    else
+        return a:char
+    endif
+endfunction
+
+" for doxygentoolkit
+let g:DoxygenToolkit_briefTag_funcName = "yes"
+" for C++ style, change the '@' to '\'
+let g:DoxygenToolkit_commentType = "C++"
+let g:DoxygenToolkit_briefTag_pre = "\\brief "
+let g:DoxygenToolkit_templateParamTag_pre = "\\tparam "
+let g:DoxygenToolkit_paramTag_pre = "\\param "
+let g:DoxygenToolkit_returnTag = "\\return "
+let g:DoxygenToolkit_throwTag_pre = "\\throw "
+let g:DoxygenToolkit_fileTag = "\\file "
+let g:DoxygenToolkit_dateTag = "\\date "
+let g:DoxygenToolkit_authorTag = "\\author "
+let g:DoxygenToolkit_versionTag = "\\version "
+let g:DoxygenToolkit_versionString = "1"
+let g:DoxygenToolkit_blockTag = "\\name "
+let g:DoxygenToolkit_classTag = "\\class "
+let g:DoxygenToolkit_authorName = "lemonxu"
+let g:doxygen_enhanced_color = 1
+
+"Reimplement CTRL-F within insert mode...
+:imap <silent>  <C-F>  <C-R>=Add_file_comment()<CR>
+"Reimplement CTRL-H within insert mode...
+:imap <silent>  <C-H>  <C-R>=Add_precompile_head()<CR>
+
+:nmap <F8> :Dox<CR>
+:nmap <F7> :DoxAuthor<CR>
+:nmap <F5> :DoxBlock<CR>
+
+:map <F12> :set filetype=cpp<CR>
+
+if(has("win32") || has("win64") || has("win95") || has("win16"))
+    :map <F11> :source $MYVIMRC<CR>
+else
+    :map <F11> :source $HOME/.vimrc<CR>
+endif
+
+:map <F10> :set encoding=utf-8<CR>
+:nmap <F3> :copen<CR><c-w>L
+
