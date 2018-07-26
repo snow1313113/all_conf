@@ -5,8 +5,34 @@
 	lg2 = log --graph --decorate --oneline --pretty=format:'%Cred%h - %C(bold white) %s %Creset %C(yellow)%d %C(cyan) <%cd> %Creset %Cgreen(%cn)' --abbrev-commit --date=format:'%Y-%m-%d %H:%M:%S'
     ad = add .
     st = status
+    pr = pull --rebase
+    cp = cherry-pick
+    di = difftool
 [color]
 	ui = true
+
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+
+[color "diff"]
+    meta = yellow bold
+    flag = magenta bold
+    old = red bold
+    new = green bold
+
+[color "status"]
+    added = yellow
+    changed = green
+    untracked = red
+
+[diff]
+    tool = vimdiff
+
+[difftool]
+    prompt = false
+
 [user]
 	name = snow1313113
 	email = 59796717@qq.com
