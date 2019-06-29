@@ -4,7 +4,7 @@ source $VIMRUNTIME/vimrc_example.vim
 "source $VIMRUNTIME/mswin.vim
 "behave mswin
 
-set diffexpr=MyDiff()
+"set diffexpr=MyDiff()
 function! MyDiff()
   let opt = '-a --binary '
   if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
@@ -39,7 +39,7 @@ function! Add_file_comment()
     let head_str = "/*\n"
                 \    ."* file name: ".expand("%")."\n"
                 \    ."* description: ...\n"
-                \    ."* author: lemonxu\n"
+                \    ."* author: snow\n"
                 \    ."* create time:".strftime("%Y %b %d")
                 \    ."\n*/\n\n"
     return head_str
@@ -47,18 +47,17 @@ endfunction
 
 " add the precompile str in the file
 function! Add_precompile_head()
-    let def_str = toupper(substitute(expand("%"), "\\.", "_","g"))
+    let def_str = "_".toupper(substitute(expand("%"), "\\.", "_","g"))."_"
     let precompile_str = "#ifndef ".def_str."\n#define ".def_str."\n\n\n#endif"
     return Add_file_comment().precompile_str
 endfunction
 
 """""""""""""""""""""""""""
-" add by jerry
+" add by snow
 """""""""""""""""""""""""""
 if exists('+autochdir')
     set autochdir
 endif
-
 
 filetype plugin indent on
 "set syntax=on
@@ -67,6 +66,7 @@ syntax on
 " colorscheme darkblue
 " colorscheme solarized
 " colorscheme molokai
+colorscheme desert
 set autoindent
 
 set smartindent
@@ -132,8 +132,27 @@ let g:DoxygenToolkit_versionTag = "\\version "
 let g:DoxygenToolkit_versionString = "1"
 let g:DoxygenToolkit_blockTag = "\\name "
 let g:DoxygenToolkit_classTag = "\\class "
-let g:DoxygenToolkit_authorName = "lemonxu"
+let g:DoxygenToolkit_authorName = "snow"
 let g:doxygen_enhanced_color = 1
+
+filetype off 
+set rtp+=$HOME/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" Let vundle manage itself.
+Plugin 'VundleVim/Vundle.vim'
+
+" Plugins
+"Plugin 'vim-scripts/a.vim'
+Plugin 'google/vim-maktaba'
+Plugin 'google/vim-codefmt'
+Plugin 'google/vim-glaive'
+
+" Required, plugins available after.
+call vundle#end()
+filetype plugin indent on
+
+call glaive#Install()
 
 "Reimplement CTRL-F within insert mode...
 :imap <silent>  <C-F>  <C-R>=Add_file_comment()<CR>
